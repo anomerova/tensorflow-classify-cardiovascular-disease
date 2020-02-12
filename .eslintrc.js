@@ -1,4 +1,4 @@
-{
+module.exports = {
     "env": {
         "browser": true,
         "es6": true
@@ -25,5 +25,7 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "quotes": ["error", "single", { "avoidEscape": true }],
+        "eqeqeq": "error" --fix
     }
-}
+};
