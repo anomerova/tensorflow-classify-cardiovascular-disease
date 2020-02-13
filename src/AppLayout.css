@@ -1,0 +1,22 @@
+.content {
+  padding: 0 26px;
+  height: 100%;
+  display: flex;
+}
+
+.footer {
+  text-align: center;
+}
+
+.Input {
+  margin: 12px 12px;
+}
+
+.radioInput {
+  display: flex;
+  flex-direction:row;
+}
+
+.numberInput {
+  min-width: 50px;
+}
