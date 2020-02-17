@@ -2,7 +2,6 @@ import 'antd/dist/antd.css'
 import { Layout, Menu, Select, Input, Icon} from 'antd'
 import React from 'react'
 import './AppLayout.less'
-// import {train_model} from './model/train_data.js'
  import DataForm from './DataForm/DataForm'
 
 const { Header, Content, Footer, Sider } = Layout

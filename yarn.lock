@@ -6137,6 +6137,11 @@ seedrandom@2.4.3:
   resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-2.4.3.tgz#2438504dad33917314bff18ac4d794f16d6aaecc"
   integrity sha1-JDhQTa0zkXMUv/GKxNeU8W1qrsw=
 
+seedrandom@^2.4.4:
+  version "2.4.4"
+  resolved "https://registry.yarnpkg.com/seedrandom/-/seedrandom-2.4.4.tgz#b25ea98632c73e45f58b77cfaa931678df01f9ba"
+  integrity sha512-9A+PDmgm+2du77B5i0Ip2cxOqqHjgNxnBgglxLcX78A2D6c2rTo61z4jnVABpF4cKeDMDG+cmXXvdnqse2VqMA==
+
 select-hose@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/select-hose/-/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
@@ -6776,6 +6781,13 @@ tough-cookie@~2.5.0:
   dependencies:
     psl "^1.1.28"
     punycode "^2.1.1"
+
+train-test-split@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/train-test-split/-/train-test-split-1.0.0.tgz#a40bc24a292c64e6b21c9a4d80560313b6e76e3d"
+  integrity sha512-Ycp9KDjKj70Bv58DP6cChWKSkkL12eSgakDuuR8IsEcgfClD3HfZO8gCT7voihL7PcjELdDjldzInX4xHLkMQw==
+  dependencies:
+    seedrandom "^2.4.4"
 
 ts-loader@^6.2.1:
   version "6.2.1"

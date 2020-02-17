@@ -1,7 +1,8 @@
 import 'antd/dist/antd.css'
-import { Form, InputNumber, Radio, Input, Select} from 'antd'
+import { Form, InputNumber, Radio, Input, Select, Button} from 'antd'
 import React from 'react'
 import './DataForm.less'
+import {train_model} from '../model/train_data.js'
 
 const InputGroup = Input.Group
 const { Option } = Select
@@ -49,6 +50,9 @@ export function DataForm () {
                         <Option value="WellAboveNormal">Выше нормы</Option>
                     </Select>
                 </InputGroup>
+            </Form.Item>
+            <Form.Item>
+                <Button onClick={train_model()}></Button>
             </Form.Item>
         </Form>
     )
