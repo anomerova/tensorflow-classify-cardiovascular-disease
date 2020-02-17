@@ -1,0 +1,41 @@
+.bodyLayout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  .header {
+    background: #fff;
+    padding: 0  10px;
+
+    .trigger {
+      font-size: 18px;
+      line-height: 64px;
+      padding: 0 24px;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+    
+    .trigger:hover {
+      color: #1890ff;
+    }
+  }
+
+  .content {
+    padding: 26px;
+    height: 100%;
+    display: flex;
+    min-height: 200px;
+    flex-grow: 1;
+  }
+  
+  .footer {
+    text-align: center;
+    flex-shrink: 0;
+  }
+}
+
+.logo {
+  height: 32px;
+  background: rgba(255, 255, 255, 0.2);
+  margin: 16px;
+}

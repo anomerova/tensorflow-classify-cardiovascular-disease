@@ -27,6 +27,7 @@ module.exports = {
     ],
     "rules": {
         "quotes": ["error", "single", { "avoidEscape": true }],
-        "eqeqeq": "error" --fix
+        "eqeqeq": "error",
+        "indent": ["error", 2]
     }
 };
