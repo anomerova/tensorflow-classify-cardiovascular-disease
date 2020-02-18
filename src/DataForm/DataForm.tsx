@@ -2,7 +2,7 @@ import 'antd/dist/antd.css'
 import { Form, InputNumber, Radio, Input, Select, Button} from 'antd'
 import React from 'react'
 import './DataForm.less'
-import {train_model} from '../model/train_data.js'
+import {run} from '../model/train_data.js'
 
 const InputGroup = Input.Group
 const { Option } = Select
@@ -19,6 +19,7 @@ const formItemLayout = {
   };
 
 export function DataForm () {
+    run()
     return (
         <Form {...formItemLayout} layout="inline" className="fizicalParam">
             <Form.Item className="formItem" label="Возраст">
@@ -52,7 +53,7 @@ export function DataForm () {
                 </InputGroup>
             </Form.Item>
             <Form.Item>
-                <Button onClick={train_model()}></Button>
+                <Button></Button>
             </Form.Item>
         </Form>
     )

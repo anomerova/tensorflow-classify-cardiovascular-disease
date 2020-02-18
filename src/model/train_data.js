@@ -1,13 +1,28 @@
 import * as tf from '@tensorflow/tfjs'
 import trainTestSplit from 'train-test-split'
-import papa from 'papaparse'
 import csv from './cardio_train.csv'
 
-export function getData(){
-    // console.log(csv)
+export function getData() {
+  const [trainSplit, testSplit] = trainTestSplit(csv, 0.7, 1234)
+  const values = trainSplit.map(d => ({
+    x: [
+      d.id,
+      d.age,
+      d.gender,
+      d.height,
+      d.weight,
+      d.ap_hi,
+      d.ap_lo,
+      d.cholesterol,
+      d.gluc,
+      d.smoke,
+      d.alco,
+      d.active
+    ],
+    y: d.cardio,
+  }))
 
-    const [trainSplit, testSplit] = trainTestSplit(csv, 0.7, 1234)
-    // console.log(trainSplit, testSplit) 
+  console.log(values)
 }
 
 /*async function getDataAwait() {
@@ -22,26 +37,22 @@ export function getData(){
     return cleaned;
 }*/
   
-async function run() {
+export async function run() {
     // Create the model
-    const model = createModel(); 
-
-    // Load and plot the original input data that we are going to train on.
-    const data = await getData();
-    const values = data.map(d => ({
-        x: d.horsepower,
-        y: d.mpg,
-    }));
+    const model = createModel();
+    // const data = await getData();
+    // const [trainSplit, testSplit] = trainTestSplit(csv, 0.7, 1234)
+    // console.log(trainSplit, testSplit)
 
     // Convert the data to a form we can use for training.
-    const tensorData = convertToTensor(data);
+    const tensorData = convertToTensor(csv);
     const {inputs, labels} = tensorData;
 
     // Train the model  
-    await trainModel(model, inputs, labels);
-    console.log('Done Training');
+    // await trainModel(model, inputs, labels);
+    // console.log('Done Training');
 
-    testModel(model, data, tensorData);
+    // testModel(model, data, tensorData);
 }
   
   document.addEventListener('DOMContentLoaded', run);
@@ -58,13 +69,7 @@ async function run() {
   
     return model;
   }
-  
-  /**
-   * Convert the input data to tensors that we can use for machine 
-   * learning. We will also do the important best practices of _shuffling_
-   * the data and _normalizing_ the data
-   * MPG on the y-axis.
-   */
+ 
   function convertToTensor(data) {
     // Wrapping these calculations in a tidy will dispose any 
     // intermediate tensors.
@@ -74,7 +79,18 @@ async function run() {
       tf.util.shuffle(data);
   
       // Step 2. Convert data to Tensor
-      const inputs = data.map(d => d.horsepower)
+      const inputsAge = data.map(d => d.age),
+        inputsGender = data.map(d => d.gender),
+        inputsHeight = data.map(d => d.height),
+        inputsWeight = data.map(d => d.weight),
+        inputsApHi = data.map(d => d.ap_hie),
+        inputsApLo = data.map(d => d.ap_lo),
+        inputsCholesterol = data.map(d => d.cholesterol),
+        inputsGluc = data.map(d => d.gluc),
+        inputsSmoke = data.map(d => d.smoke),
+        inputsAlco = data.map(d => d.alco),
+        inputsActive = data.map(d => d.active)
+
       const labels = data.map(d => d.mpg);
   
       const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
@@ -100,7 +116,7 @@ async function run() {
       }
     });  
   }
-  
+  /*
   async function trainModel(model, inputs, labels) {
     // Prepare the model for training.  
     model.compile({
@@ -166,4 +182,4 @@ async function run() {
         height: 300
       }
     );
-  }
+  } */
