@@ -39,18 +39,18 @@ export function getData() {
   
 export async function run() {
     // Create the model
-    const model = createModel();
+    const model = createModel()
     // const data = await getData();
-    // const [trainSplit, testSplit] = trainTestSplit(csv, 0.7, 1234)
+    const [trainSplit, testSplit] = trainTestSplit(csv, 0.7, 1234)
     // console.log(trainSplit, testSplit)
 
     // Convert the data to a form we can use for training.
-    const tensorData = convertToTensor(csv);
-    const {inputs, labels} = tensorData;
+    const tensorData = convertToTensor(trainSplit)
+    const {inputs, outputs} = tensorData
 
     // Train the model  
-    // await trainModel(model, inputs, labels);
-    // console.log('Done Training');
+    await trainModel(model, inputs, outputs)
+    console.log('Done Training');
 
     // testModel(model, data, tensorData);
 }
@@ -62,8 +62,10 @@ export async function run() {
     const model = tf.sequential(); 
     
     // Add a single hidden layer
-    model.add(tf.layers.dense({inputShape: [1], units: 1, useBias: true}));
-    
+    model.add(tf.layers.dense({units: 11, inputShape: [11, 49000], useBias: true}));
+
+    //https://stackoverflow.com/questions/52796751/error-when-checking-input-expected-dense-dense5-input-to-have-4-dimensions-b
+    model.add(tf.layers.flatten())
     // Add an output layer
     model.add(tf.layers.dense({units: 1, useBias: true}));
   
@@ -71,14 +73,12 @@ export async function run() {
   }
  
   function convertToTensor(data) {
-    // Wrapping these calculations in a tidy will dispose any 
-    // intermediate tensors.
-    
+
     return tf.tidy(() => {
-      // Step 1. Shuffle the data    
+      // Shuffle the data    
       tf.util.shuffle(data);
   
-      // Step 2. Convert data to Tensor
+      // Convert data to Tensor
       const inputsAge = data.map(d => d.age),
         inputsGender = data.map(d => d.gender),
         inputsHeight = data.map(d => d.height),
@@ -89,35 +89,49 @@ export async function run() {
         inputsGluc = data.map(d => d.gluc),
         inputsSmoke = data.map(d => d.smoke),
         inputsAlco = data.map(d => d.alco),
-        inputsActive = data.map(d => d.active)
+        inputsActive = data.map(d => d.active),
+        outputsCardio = data.map(d => d.cardio);
+  
+      const inputsAgeTensor = tf.tensor2d(inputsAge, [inputsAge.length, 1]);
+      const inputsGenderTensor = tf.tensor2d(inputsGender, [inputsGender.length, 1]);
+      const inputsHeightTensor = tf.tensor2d(inputsHeight, [inputsHeight.length, 1]);
+      const inputsWeightTensor = tf.tensor2d(inputsWeight, [inputsWeight.length, 1]);
+      const inputsApHiTensor = tf.tensor2d(inputsApHi, [inputsApHi.length, 1]);
+      const inputsApLoTensor = tf.tensor2d(inputsApLo, [inputsApLo.length, 1]);
+      const inputsCholesterolTensor = tf.tensor2d(inputsCholesterol, [inputsCholesterol.length, 1]);
+      const inputsGlucTensor = tf.tensor2d(inputsGluc, [inputsGluc.length, 1]);
+      const inputsSmokeTensor = tf.tensor2d(inputsSmoke, [inputsSmoke.length, 1]);
+      const inputsAlcoTensor = tf.tensor2d(inputsAlco, [inputsAlco.length, 1]);
+      const inputsActiveTensor = tf.tensor2d(inputsActive, [inputsActive.length, 1]);
+      const outputsCardioTensor = tf.tensor2d(outputsCardio, [outputsCardio.length, 1]);
+  
+      //Normalize the data to the range 0 - 1 using min-max scaling 
+    
+      const inputs = [
+        inputsAgeTensor.sub(inputsAgeTensor.min()).div(inputsAgeTensor.max().sub(inputsAgeTensor.min())),
+        inputsGenderTensor.sub(inputsGenderTensor.min()).div(inputsGenderTensor.max().sub(inputsGenderTensor.min())),
+        inputsHeightTensor.sub(inputsHeightTensor.min()).div(inputsHeightTensor.max().sub(inputsHeightTensor.min())),
+        inputsWeightTensor.sub(inputsWeightTensor.min()).div(inputsWeightTensor.max().sub(inputsWeightTensor.min())),
+        inputsApHiTensor.sub(inputsApHiTensor.min()).div(inputsApHiTensor.max().sub(inputsApHiTensor.min())),
+        inputsApLoTensor.sub(inputsApLoTensor.min()).div(inputsApLoTensor.max().sub(inputsApLoTensor.min())),
+        inputsCholesterolTensor.sub(inputsCholesterolTensor.min()).div(inputsCholesterolTensor.max().sub(inputsCholesterolTensor.min())),
+        inputsGlucTensor.sub(inputsGlucTensor.min()).div(inputsGlucTensor.max().sub(inputsGlucTensor.min())),
+        inputsSmokeTensor.sub(inputsSmokeTensor.min()).div(inputsSmokeTensor.max().sub(inputsSmokeTensor.min())),
+        inputsAlcoTensor.sub(inputsAlcoTensor.min()).div(inputsAlcoTensor.max().sub(inputsAlcoTensor.min())),
+        inputsActiveTensor.sub(inputsActiveTensor.min()).div(inputsActiveTensor.max().sub(inputsActiveTensor.min())),
+      ]
 
-      const labels = data.map(d => d.mpg);
-  
-      const inputTensor = tf.tensor2d(inputs, [inputs.length, 1]);
-      const labelTensor = tf.tensor2d(labels, [labels.length, 1]);
-  
-      //Step 3. Normalize the data to the range 0 - 1 using min-max scaling
-      const inputMax = inputTensor.max();
-      const inputMin = inputTensor.min();  
-      const labelMax = labelTensor.max();
-      const labelMin = labelTensor.min();
-  
-      const normalizedInputs = inputTensor.sub(inputMin).div(inputMax.sub(inputMin));
-      const normalizedLabels = labelTensor.sub(labelMin).div(labelMax.sub(labelMin));
-  
+      const outputs = outputsCardioTensor.sub(outputsCardioTensor.min()).div(outputsCardioTensor.max().sub(outputsCardioTensor.min()));
+
+      console.log(inputs)
       return {
-        inputs: normalizedInputs,
-        labels: normalizedLabels,
-        // Return the min/max bounds so we can use them later.
-        inputMax,
-        inputMin,
-        labelMax,
-        labelMin,
+        inputs: inputs,
+        labels: outputs
       }
     });  
   }
-  /*
-  async function trainModel(model, inputs, labels) {
+  
+  async function trainModel(model, inputs, outputs) {
     // Prepare the model for training.  
     model.compile({
       optimizer: tf.train.adam(),
@@ -125,21 +139,17 @@ export async function run() {
       metrics: ['mse'],
     });
     
-    const batchSize = 32;
-    const epochs = 50;
+    const batchSize = 32
+    const epochs = 50
     
-    return await model.fit(inputs, labels, {
+    return await model.fit(tf.stack(inputs, outputs, {
       batchSize,
       epochs,
-      shuffle: true,
-      callbacks: tfvis.show.fitCallbacks(
-        { name: 'Training Performance' },
-        ['loss', 'mse'], 
-        { height: 200, callbacks: ['onEpochEnd'] }
-      )
-    });
+      shuffle: true
+    }))
   }
-  
+
+  /*
   function testModel(model, inputData, normalizationData) {
     const {inputMax, inputMin, labelMin, labelMax} = normalizationData;  
     
