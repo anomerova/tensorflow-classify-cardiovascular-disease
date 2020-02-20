@@ -3,9 +3,13 @@ import { Form, InputNumber, Radio, Input, Select, Button} from 'antd'
 import React from 'react'
 import './DataForm.less'
 import {run} from '../model/train_data.js'
+import {Dataset} from '../model/data.js'
 
 const InputGroup = Input.Group
 const { Option } = Select
+const trainData = new Dataset
+
+console.log(trainData.loadData())
 
 const formItemLayout = {
     labelCol: {
@@ -19,7 +23,7 @@ const formItemLayout = {
   };
 
 export function DataForm () {
-    run()
+    // run()
     return (
         <Form {...formItemLayout} layout="inline" className="fizicalParam">
             <Form.Item className="formItem" label="Возраст">

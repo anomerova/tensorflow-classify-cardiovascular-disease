@@ -1,5 +1,4 @@
 import * as tf from '@tensorflow/tfjs'
-import trainTestSplit from 'train-test-split'
 import csv from './cardio_train.csv'
 
 export function getData() {
@@ -62,7 +61,7 @@ export async function run() {
     const model = tf.sequential(); 
     
     // Add a single hidden layer
-    model.add(tf.layers.dense({units: 11, inputShape: [11, 49000], useBias: true}));
+    model.add(tf.layers.dense({units: 11, inputShape: [49000], useBias: true}));
 
     //https://stackoverflow.com/questions/52796751/error-when-checking-input-expected-dense-dense5-input-to-have-4-dimensions-b
     model.add(tf.layers.flatten())
@@ -74,8 +73,7 @@ export async function run() {
  
   function convertToTensor(data) {
 
-    return tf.tidy(() => {
-      // Shuffle the data    
+    return tf.tidy(() => {   
       tf.util.shuffle(data);
   
       // Convert data to Tensor
@@ -92,18 +90,18 @@ export async function run() {
         inputsActive = data.map(d => d.active),
         outputsCardio = data.map(d => d.cardio);
   
-      const inputsAgeTensor = tf.tensor2d(inputsAge, [inputsAge.length, 1]);
-      const inputsGenderTensor = tf.tensor2d(inputsGender, [inputsGender.length, 1]);
-      const inputsHeightTensor = tf.tensor2d(inputsHeight, [inputsHeight.length, 1]);
-      const inputsWeightTensor = tf.tensor2d(inputsWeight, [inputsWeight.length, 1]);
-      const inputsApHiTensor = tf.tensor2d(inputsApHi, [inputsApHi.length, 1]);
-      const inputsApLoTensor = tf.tensor2d(inputsApLo, [inputsApLo.length, 1]);
-      const inputsCholesterolTensor = tf.tensor2d(inputsCholesterol, [inputsCholesterol.length, 1]);
-      const inputsGlucTensor = tf.tensor2d(inputsGluc, [inputsGluc.length, 1]);
-      const inputsSmokeTensor = tf.tensor2d(inputsSmoke, [inputsSmoke.length, 1]);
-      const inputsAlcoTensor = tf.tensor2d(inputsAlco, [inputsAlco.length, 1]);
-      const inputsActiveTensor = tf.tensor2d(inputsActive, [inputsActive.length, 1]);
-      const outputsCardioTensor = tf.tensor2d(outputsCardio, [outputsCardio.length, 1]);
+      const inputsAgeTensor = tf.tensor(inputsAge, [inputsAge.length, 1]);
+      const inputsGenderTensor = tf.tensor(inputsGender, [inputsGender.length, 1]);
+      const inputsHeightTensor = tf.tensor(inputsHeight, [inputsHeight.length, 1]);
+      const inputsWeightTensor = tf.tensor(inputsWeight, [inputsWeight.length, 1]);
+      const inputsApHiTensor = tf.tensor(inputsApHi, [inputsApHi.length, 1]);
+      const inputsApLoTensor = tf.tensor(inputsApLo, [inputsApLo.length, 1]);
+      const inputsCholesterolTensor = tf.tensor(inputsCholesterol, [inputsCholesterol.length, 1]);
+      const inputsGlucTensor = tf.tensor(inputsGluc, [inputsGluc.length, 1]);
+      const inputsSmokeTensor = tf.tensor(inputsSmoke, [inputsSmoke.length, 1]);
+      const inputsAlcoTensor = tf.tensor(inputsAlco, [inputsAlco.length, 1]);
+      const inputsActiveTensor = tf.tensor(inputsActive, [inputsActive.length, 1]);
+      const outputsCardioTensor = tf.tensor(outputsCardio, [outputsCardio.length, 1]);
   
       //Normalize the data to the range 0 - 1 using min-max scaling 
     
