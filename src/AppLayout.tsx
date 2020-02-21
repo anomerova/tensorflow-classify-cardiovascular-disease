@@ -2,7 +2,7 @@ import 'antd/dist/antd.css'
 import { Layout, Menu, Select, Input, Icon} from 'antd'
 import React from 'react'
 import './AppLayout.less'
- import DataForm from './DataForm/DataForm'
+import DataForm from './DataForm/DataForm'
 
 const { Header, Content, Footer, Sider } = Layout
 
@@ -20,8 +20,6 @@ class AppLayout extends React.Component {
         collapsed: !this.state.collapsed,
       });
     }
-
-    //train_model()
     render() {
         return (
             <Layout className="allLayout">

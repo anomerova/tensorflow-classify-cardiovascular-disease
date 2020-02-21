@@ -33,21 +33,19 @@ export class Dataset {
         d.smoke,
         d.alco,
         d.active
-    ]),
-    outputs = csv.map(d => d.cardio);
+    ])
+    const outputs = csv.map(d => d.cardio);
 
-    const trainFeatures = trainTestSplit(inputs, 0.7)
+    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.7);
+    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.7);
 
-    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.7)
-    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.7)
-
-    console.log(trainFeatures)
-    // shuffle(this.trainFeatures, this.trainTarget);
-    // shuffle(this.testFeatures, this.testTarget);
+    console.log(this.trainTarget, this.testTarget)
+    shuffle(this.trainFeatures, this.trainTarget);
+    shuffle(this.testFeatures, this.testTarget);
   }
 }
 
-/*function shuffle(data, target) {
+function shuffle(data, target) {
   let counter = data.length;
   let temp = 0;
   let index = 0;
@@ -63,4 +61,4 @@ export class Dataset {
     target[counter] = target[index];
     target[index] = temp;
   }
-}*/
+}
