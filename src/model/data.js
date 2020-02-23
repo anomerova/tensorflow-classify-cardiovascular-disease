@@ -20,7 +20,6 @@ export class Dataset {
 
   /** Loads training and test data. */
   loadData() {
-
     const inputs = csv.map(d =>  [
         d.age,
         d.gender,
@@ -36,12 +35,11 @@ export class Dataset {
     ])
     const outputs = csv.map(d => d.cardio);
 
-    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.7);
-    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.7);
+    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.01);
+    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.01);
 
-    console.log(this.trainTarget, this.testTarget)
-    shuffle(this.trainFeatures, this.trainTarget);
-    shuffle(this.testFeatures, this.testTarget);
+    shuffle(this.trainFeatures, this.trainTarget)
+    shuffle(this.testFeatures, this.testTarget)
   }
 }
 

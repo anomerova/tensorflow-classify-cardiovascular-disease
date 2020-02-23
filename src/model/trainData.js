@@ -1,15 +1,19 @@
 import * as tf from '@tensorflow/tfjs'
-import {Dataset} from '../model/data.js'
+import {Dataset} from './data.js'
+import * as normalization from './normalization';
 
 const trainData = new Dataset
+const tensors = {}
 
-console.log(trainData.loadData())
+const NUM_EPOCHS = 200;
+const BATCH_SIZE = 40;
+const LEARNING_RATE = 0.01;
   
 export function arraysToTensors() {
-    tensors.rawTrainFeatures = tf.tensor2d(trainData.trainFeatures);
-    tensors.trainTarget = tf.tensor2d(trainData.trainTarget);
-    tensors.rawTestFeatures = tf.tensor2d(trainData.testFeatures);
-    tensors.testTarget = tf.tensor2d(trainData.testTarget);
+    tensors.rawTrainFeatures = tf.tensor(trainData.trainFeatures);
+    tensors.trainTarget = tf.tensor(trainData.trainTarget);
+    tensors.rawTestFeatures = tf.tensor(trainData.testFeatures);
+    tensors.testTarget = tf.tensor(trainData.testTarget);
     // Normalize mean and standard deviation of data.
     let {dataMean, dataStd} =
         normalization.determineMeanAndStddev(tensors.rawTrainFeatures);
@@ -47,19 +51,23 @@ export function arraysToTensors() {
     return outList;
   }
 
-  export async function run(model) {
+  export async function run() {
+
+    const model = multiLayerPerceptronRegressionModel2Hidden()
+
     model.compile(
         {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
   
     await model.fit(tensors.trainFeatures, tensors.trainTarget, {
       batchSize: BATCH_SIZE,
       epochs: NUM_EPOCHS,
-      validationSplit: 0.2,
+      validationSplit: 0.2
+    }).then(info => {
+      console.log('Final accuracy', info);
     });
   };
 
   document.addEventListener('DOMContentLoaded', async () => {
     await trainData.loadData();
     arraysToTensors();
-    computeBaseline();
   }, false);
