@@ -2,7 +2,6 @@ import 'antd/dist/antd.css'
 import { Form, InputNumber, Radio, Input, Select, Button} from 'antd'
 import React from 'react'
 import './DataForm.less'
-import {run} from '../model/trainData.js'
 
 const InputGroup = Input.Group
 const { Option } = Select
@@ -52,7 +51,7 @@ export function DataForm () {
                 </InputGroup>
             </Form.Item>
             <Form.Item>
-                <Button onClick={async () => {await run()}}>Click to me!</Button>
+                <Button>Click to me!</Button>
             </Form.Item>
         </Form>
     )

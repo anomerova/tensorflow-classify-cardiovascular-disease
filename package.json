@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/anomerova/tensorflow-classify-cardiovascular-disease.git",
-  "author": "Nomerova.A.V>",
+  "author": "Nomerova.A.V",
   "license": "MIT",
   "dependencies": {
     "@babel/runtime": "^7.8.4",
@@ -14,6 +14,7 @@
     "papaparse": "^5.1.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-redux": "^7.2.0",
     "train-test-split": "^1.0.0"
   },
   "devDependencies": {
@@ -25,6 +26,7 @@
     "@babel/preset-react": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
     "@types/react-dom": "^16.9.5",
+    "@types/react-redux": "^7.1.7",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
     "babel-loader": "^8.0.6",

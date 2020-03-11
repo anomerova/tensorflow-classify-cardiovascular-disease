@@ -3,6 +3,7 @@ import { Layout, Menu, Select, Input, Icon} from 'antd'
 import React from 'react'
 import './AppLayout.less'
 import DataForm from './DataForm/DataForm'
+import Charts from './Charts/Charts'
 
 const { Header, Content, Footer, Sider } = Layout
 
@@ -42,6 +43,7 @@ class AppLayout extends React.Component {
                 </Header>
                 <Content className="content">
                   <DataForm />
+                  <Charts />
                 </Content>
                 <Footer className="footer">Приложение распространияется под лицензией MIT</Footer>
               </Layout>

@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs'
 import {Dataset} from './data.js'
 import * as normalization from './normalization';
+import * as UI from '../ui.js'
 
 const trainData = new Dataset
 const tensors = {}
@@ -22,6 +23,28 @@ export function arraysToTensors() {
         tensors.rawTrainFeatures, dataMean, dataStd);
     tensors.testFeatures =
         normalization.normalizeTensor(tensors.rawTestFeatures, dataMean, dataStd);
+  };
+
+  export function linearRegressionModel() {
+    const model = tf.sequential();
+    model.add(tf.layers.dense({inputShape: [trainData.numFeatures], units: 1}));
+  
+    model.summary();
+    return model;
+  };
+
+  export function multiLayerPerceptronRegressionModel1Hidden() {
+    const model = tf.sequential();
+    model.add(tf.layers.dense({
+      inputShape: [trainData.numFeatures],
+      units: 50,
+      activation: 'sigmoid',
+      kernelInitializer: 'leCunNormal'
+    }));
+    model.add(tf.layers.dense({units: 1}));
+  
+    model.summary();
+    return model;
   };
 
   export function multiLayerPerceptronRegressionModel2Hidden() {
@@ -51,9 +74,7 @@ export function arraysToTensors() {
     return outList;
   }
 
-  export async function run() {
-
-    const model = multiLayerPerceptronRegressionModel2Hidden()
+  export async function run(model) {
 
     model.compile(
         {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
@@ -69,5 +90,10 @@ export function arraysToTensors() {
 
   document.addEventListener('DOMContentLoaded', async () => {
     await trainData.loadData();
+    UI.updateStatus('Data loaded, converting to tensors');
     arraysToTensors();
+    UI.updateStatus(
+        'Data is now available as tensors.\n' +
+        'Click a train button to begin.');
+    UI.updateBaselineStatus('Estimating baseline loss');
   }, false);
