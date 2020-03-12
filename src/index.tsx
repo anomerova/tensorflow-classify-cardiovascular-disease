@@ -10,8 +10,8 @@ import './index.css'
 const store = createStore(reducers as any);
 
 ReactDOM.render(
-    <Provider store={store}>
-        <App />
-    </Provider>, 
+        <Provider store={store}>
+            <App />
+        </Provider>, 
     document.getElementById('root')
 );

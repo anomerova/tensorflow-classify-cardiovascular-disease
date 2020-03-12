@@ -1,4 +1,5 @@
 import * as tf from '@tensorflow/tfjs'
+import * as tfvis from '@tensorflow/tfjs-vis'
 import {Dataset} from './data.js'
 import * as normalization from './normalization';
 import * as UI from '../ui.js'
@@ -78,22 +79,22 @@ export function arraysToTensors() {
 
     model.compile(
         {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
-  
+    let trainLogs = [];
+
     await model.fit(tensors.trainFeatures, tensors.trainTarget, {
       batchSize: BATCH_SIZE,
       epochs: NUM_EPOCHS,
-      validationSplit: 0.2
-    }).then(info => {
-      console.log('Final accuracy', info);
-    });
+      validationSplit: 0.2,
+      callbacks: {
+        onEpochEnd: async (logs) => {
+          trainLogs.push(logs);
+          tfvis.show.history(trainLogs, ['loss', 'val_loss'])
+        }
+      }
+    })
   };
 
   document.addEventListener('DOMContentLoaded', async () => {
     await trainData.loadData();
-    UI.updateStatus('Data loaded, converting to tensors');
     arraysToTensors();
-    UI.updateStatus(
-        'Data is now available as tensors.\n' +
-        'Click a train button to begin.');
-    UI.updateBaselineStatus('Estimating baseline loss');
   }, false);
