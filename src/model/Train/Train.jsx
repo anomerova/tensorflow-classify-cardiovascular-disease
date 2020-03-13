@@ -1,11 +1,10 @@
 import React from 'react'
 import * as tf from '@tensorflow/tfjs'
-import * as tfvis from '@tensorflow/tfjs-vis'
 import {Dataset} from '../data.js'
 import * as normalization from '../normalization'
-import {XYPlot, LineSeries} from 'react-vis'
+import Chart from './Chart.jsx'
 
-import './Charts.less'
+import './Train.less'
 
 const trainData = new Dataset
 const tensors = {}
@@ -29,13 +28,15 @@ export function arraysToTensors() {
         normalization.normalizeTensor(tensors.rawTestFeatures, dataMean, dataStd);
 }
 
-export default class Charts extends React.Component {
+export default class Train extends React.Component {
 
     constructor () {
         super()
 
         this.state = {
-            trainHistory: []
+            linearTrainHistory: [],
+            oneHiddenTrainHistory: [],
+            twoHiddenTrainHistory: []
         }
     }
 
@@ -77,7 +78,8 @@ export default class Charts extends React.Component {
         return model;
     }
 
-    async run(model) {
+    async run(model, stateDataName) {
+        console.log(stateDataName)
         model.compile(
             {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
 
@@ -87,8 +89,8 @@ export default class Charts extends React.Component {
         validationSplit: 0.2,
         callbacks: {
             onEpochEnd: async (epoch, logs) => {
-            console.log(epoch, logs, logs.loss)
-            this.setState({trainHistory: this.state.trainHistory.concat(logs)})
+            //console.log(epoch, logs, logs.loss)
+            this.setState({[stateDataName]: this.state[stateDataName].concat(logs)})
             }
         }
         }).then(info => {
@@ -96,66 +98,50 @@ export default class Charts extends React.Component {
           })
     };
 
+    getDataForChart(data) {
+        return data.map(item => {return {x: item.val_loss, y: item.loss}})
+    }
+
 
     render () {
-        const data = [
-            {x: 0, y: 8},
-            {x: 1, y: 5},
-            {x: 2, y: 4},
-            {x: 3, y: 9},
-            {x: 4, y: 1},
-            {x: 5, y: 7},
-            {x: 6, y: 6},
-            {x: 7, y: 3},
-            {x: 8, y: 2},
-            {x: 9, y: 0}
-          ]
-        console.log(this.state.trainHistory)
         return <div>
             <p className='section-head'>Training Progress</p>
-            <div className="with-cols">
+            <div className="withCols">
                 <div id="linear">
-                    <div className="chart">
-                    <XYPlot height={200} width={200}>
-                        <LineSeries data={data} />
-                    </XYPlot>
-                    </div>
                     <div className="status"></div>
                     <button 
                         id="simple-mlr"
-                        onClick={async (e) => {
-                            const model = this.linearRegressionModel()
-                            await this.run(model)
-                        }}
+                        onClick={async (e) => {await this.run(this.linearRegressionModel(), 'linearTrainHistory')}}
                     >
                         Train Linear Regressor
                     </button>
+                    <div className="chart">
+                        <Chart data={this.getDataForChart(this.state.linearTrainHistory)}/>
+                    </div>
                 </div>
                 <div id="oneHidden">
-                    <div className="chart"></div>
                     <div className="status"></div>
                     <button 
                         id="nn-mlr-1hidden"
-                        onClick={async () => {
-                            const model = this.multiLayerPerceptronRegressionModel1Hidden();
-                            await this.run(model);
-                        }}
+                        onClick={async () => {await this.run(this.multiLayerPerceptronRegressionModel1Hidden(), 'oneHiddenTrainHistory')}}
                     >
                         Train Neural Network Regressor (1 hidden layer)
                     </button>
+                    <div className="chart">
+                        <Chart data={this.getDataForChart(this.state.oneHiddenTrainHistory)}/>
+                    </div>
                 </div>
                 <div id="twoHidden">
-                    <div className="chart"></div>
                     <div className="status"></div>
                     <button 
                         id="nn-mlr-2hidden"
-                        onClick={async () => {
-                            const model = this.multiLayerPerceptronRegressionModel2Hidden();
-                            await this.run(model);
-                        }}
+                        onClick={async () => {await this.run(this.multiLayerPerceptronRegressionModel2Hidden(), 'twoHiddenTrainHistory')}}
                     >
                         Train Neural Network Regressor (2 hidden layers)
                     </button>
+                    <div className="chart">
+                        <Chart data={this.getDataForChart(this.state.twoHiddenTrainHistory)}/>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,7 +3,7 @@ import { Layout, Menu, Icon} from 'antd'
 import React from 'react'
 import './AppLayout.less'
 import DataForm from './DataForm/DataForm'
-import Charts from './model/Charts/Charts.jsx'
+import Train from './model/Train/Train.jsx'
 import {HashRouter, NavLink, Route} from 'react-router-dom'
 
 const { Header, Content, Footer, Sider } = Layout
@@ -56,7 +56,7 @@ class AppLayout extends React.Component {
                 </Header>
                 <Content className="content">
                   <Route exact path="/" component={DataForm} />
-                  <Route exact path="/train" component={Charts} />
+                  <Route exact path="/train" component={Train} />
                 </Content>
                 <Footer className="footer">Приложение распространияется под лицензией MIT</Footer>
               </Layout>
