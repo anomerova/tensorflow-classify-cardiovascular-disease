@@ -2,7 +2,8 @@ import React from 'react'
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis'
 import {Dataset} from '../data.js'
-import * as normalization from '../normalization';
+import * as normalization from '../normalization'
+import {XYPlot, LineSeries} from 'react-vis'
 
 import './Charts.less'
 
@@ -76,17 +77,6 @@ export default class Charts extends React.Component {
         return model;
     }
 
-    describeKernelElements(kernel) {
-        tf.util.assert(
-            kernel.length == 12,
-            `kernel must be a array of length 12, got ${kernel.length}`);
-        const outList = [];
-        for (let idx = 0; idx < kernel.length; idx++) {
-        outList.push({description: featureDescriptions[idx], value: kernel[idx]});
-        }
-        return outList;
-    }
-
     async run(model) {
         model.compile(
             {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
@@ -96,20 +86,39 @@ export default class Charts extends React.Component {
         epochs: NUM_EPOCHS,
         validationSplit: 0.2,
         callbacks: {
-            onEpochEnd: async (logs) => {
+            onEpochEnd: async (epoch, logs) => {
+            console.log(epoch, logs, logs.loss)
             this.setState({trainHistory: this.state.trainHistory.concat(logs)})
             }
         }
-        })
+        }).then(info => {
+            console.log('Final accuracy', info);
+          })
     };
 
+
     render () {
+        const data = [
+            {x: 0, y: 8},
+            {x: 1, y: 5},
+            {x: 2, y: 4},
+            {x: 3, y: 9},
+            {x: 4, y: 1},
+            {x: 5, y: 7},
+            {x: 6, y: 6},
+            {x: 7, y: 3},
+            {x: 8, y: 2},
+            {x: 9, y: 0}
+          ]
+        console.log(this.state.trainHistory)
         return <div>
             <p className='section-head'>Training Progress</p>
             <div className="with-cols">
                 <div id="linear">
                     <div className="chart">
-                        {tfvis.show.history(this.state.trainHistory, ['loss', 'val_loss'])}
+                    <XYPlot height={200} width={200}>
+                        <LineSeries data={data} />
+                    </XYPlot>
                     </div>
                     <div className="status"></div>
                     <button 

@@ -64,17 +64,6 @@ export function arraysToTensors() {
     return model;
   };
 
-  export function describeKernelElements(kernel) {
-    tf.util.assert(
-        kernel.length == 12,
-        `kernel must be a array of length 12, got ${kernel.length}`);
-    const outList = [];
-    for (let idx = 0; idx < kernel.length; idx++) {
-      outList.push({description: featureDescriptions[idx], value: kernel[idx]});
-    }
-    return outList;
-  }
-
   export async function run(model) {
 
     model.compile(
