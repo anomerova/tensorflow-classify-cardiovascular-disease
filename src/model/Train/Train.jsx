@@ -1,9 +1,9 @@
 import React from 'react'
 import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis';
-import {Dataset} from '../data.js'
+import {Dataset, featureDescriptions} from '../data.js'
 import * as normalization from '../normalization'
-import Chart from './Chart.jsx'
+import { Table } from 'antd'
 
 import './Train.less'
 
@@ -39,14 +39,10 @@ export default class Train extends React.Component {
             oneHiddenTrainHistory: [],
             twoHiddenTrainHistory: []
         }
-    }
 
-    componentWillMount() {
-        tfvis.visor().open()
-    }
-
-    componentWillUnmount() {
-        tfvis.visor().close()
+        this.linearTrainRef = React.createRef()
+        this.oneHiddenTrainRef = React.createRef()
+        this.twoHiddenTrainRef = React.createRef()
     }
 
     linearRegressionModel() {
@@ -87,22 +83,37 @@ export default class Train extends React.Component {
         return model;
     }
 
-    async run(model, stateDataName) {
-        model.compile({optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
-        const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
-        const container = {
-            name: stateDataName, styles: { width: '1200px' }
+    describeKernelElements(kernel) {
+        tf.util.assert(
+            kernel.length == [trainData.numFeatures],
+            `kernel must be a array of length 12, got ${kernel.length}`);
+        const outList = [];
+        for (let idx = 0; idx < kernel.length; idx++) {
+          outList.push({description: featureDescriptions[idx], value: kernel[idx]});
+        }
+        return outList;
+      }
 
-        };
-        const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
+    async run(model, stateDataName, ref) {
+        model.compile({optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
+        const trainLogs = []
         await model.fit(tensors.trainFeatures, tensors.trainTarget, {
             batchSize: BATCH_SIZE,
             epochs: NUM_EPOCHS,
             validationSplit: 0.2,
-            callbacks: fitCallbacks
-        }).then(info => {
-            console.log('Final accuracy', info)
-          })
+            callbacks: {
+                onEpochEnd: async (epoch, logs) => {
+                    trainLogs.push(logs);
+                    tfvis.show.history(this[ref].current, trainLogs, ['loss', 'val_loss'])
+
+                    model.layers[0].getWeights()[0].data().then(kernelAsArr => {
+                        const weightsList = this.describeKernelElements(kernelAsArr)
+                        const weightArray = weightsList.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
+                        this.setState({[stateDataName]: weightArray})
+                      });
+                }
+            }
+        })
     };
 
     getDataForChart(data) {
@@ -118,28 +129,52 @@ export default class Train extends React.Component {
                     <div className="status"></div>
                     <button 
                         id="simple-mlr"
-                        onClick={async (e) => {await this.run(this.linearRegressionModel(), 'linearTrainHistory')}}
+                        onClick={async (e) => {
+                            await this.run(
+                                this.linearRegressionModel(),
+                                'linearTrainHistory',
+                                'linearTrainRef'
+                            )
+                        }}
                     >
                         Train Linear Regressor
                     </button>
+                    <div ref={this.linearTrainRef} />
+                    <div>
+                    <Table dataSource={this.state.linearTrainHistory} />;
+                    </div>
                 </div>
                 <div id="oneHidden">
                     <div className="status"></div>
                     <button 
                         id="nn-mlr-1hidden"
-                        onClick={async () => {await this.run(this.multiLayerPerceptronRegressionModel1Hidden(), 'oneHiddenTrainHistory')}}
+                        onClick={async () => {
+                            await this.run(
+                                this.multiLayerPerceptronRegressionModel1Hidden(),
+                                'oneHiddenTrainHistory',
+                                'oneHiddenTrainRef'
+                            )
+                        }}
                     >
                         Train Neural Network Regressor (1 hidden layer)
                     </button>
+                    <div ref={this.oneHiddenTrainRef} />
                 </div>
                 <div id="twoHidden">
                     <div className="status"></div>
                     <button 
                         id="nn-mlr-2hidden"
-                        onClick={async () => {await this.run(this.multiLayerPerceptronRegressionModel2Hidden(), 'twoHiddenTrainHistory')}}
+                        onClick={async () => {
+                            await this.run(
+                                this.multiLayerPerceptronRegressionModel2Hidden(),
+                                'twoHiddenTrainHistory',
+                                'twoHiddenTrainRef'
+                            )
+                        }}
                     >
                         Train Neural Network Regressor (2 hidden layers)
                     </button>
+                    <div ref={this.twoHiddenTrainRef} />
                 </div>
             </div>
         </div>

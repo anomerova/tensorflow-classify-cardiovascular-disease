@@ -35,13 +35,19 @@ export class Dataset {
     ])
     const outputs = csv.map(d => d.cardio);
 
-    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.01);
-    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.01);
+    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.001);
+    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.001);
 
     shuffle(this.trainFeatures, this.trainTarget)
     shuffle(this.testFeatures, this.testTarget)
   }
 }
+
+export const featureDescriptions = [
+  'Возраст', 'Пол', 'Рост', 'Вес',
+  'Систолическое давление', 'Диастолическое давление', 'Холестерин',
+  'Глюкоза', 'Курение', 'Алкоголь', 'Физическая активность'
+];
 
 function shuffle(data, target) {
   let counter = data.length;
