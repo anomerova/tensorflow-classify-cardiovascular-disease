@@ -31,14 +31,12 @@ class AppLayout extends React.Component {
                 <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
                   <Menu.Item key="1">
                     <NavLink exact to="/" activeClassName="selected">
-                    // @ts-ignore
                       <Icon type="upload" />
                       <span>Ввод параметров для диагностики</span>
                     </NavLink>
                   </Menu.Item>
                   <Menu.Item key="1">
                     <NavLink exact to="/train" activeClassName="selected">
-                    // @ts-ignore
                       <Icon type="upload" />
                       <span>Обучение моделей</span>
                     </NavLink>
@@ -47,7 +45,6 @@ class AppLayout extends React.Component {
               </Sider>
               <Layout className="bodyLayout">
                 <Header className="header">
-                  // @ts-ignore
                 <Icon
                   className="trigger"
                   type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}

@@ -1,5 +1,6 @@
 import React from 'react'
 import * as tf from '@tensorflow/tfjs'
+import * as tfvis from '@tensorflow/tfjs-vis';
 import {Dataset} from '../data.js'
 import * as normalization from '../normalization'
 import Chart from './Chart.jsx'
@@ -40,6 +41,14 @@ export default class Train extends React.Component {
         }
     }
 
+    componentWillMount() {
+        tfvis.visor().open()
+    }
+
+    componentWillUnmount() {
+        tfvis.visor().close()
+    }
+
     linearRegressionModel() {
         const model = tf.sequential();
         model.add(tf.layers.dense({inputShape: [trainData.numFeatures], units: 1}));
@@ -50,11 +59,11 @@ export default class Train extends React.Component {
 
     multiLayerPerceptronRegressionModel1Hidden() {
         const model = tf.sequential();
-        model.add(tf.layers.dense({
-        inputShape: [trainData.numFeatures],
-        units: 50,
-        activation: 'sigmoid',
-        kernelInitializer: 'leCunNormal'
+            model.add(tf.layers.dense({
+            inputShape: [trainData.numFeatures],
+            units: 50,
+            activation: 'sigmoid',
+            kernelInitializer: 'leCunNormal'
         }));
         model.add(tf.layers.dense({units: 1}));
     
@@ -65,10 +74,10 @@ export default class Train extends React.Component {
     multiLayerPerceptronRegressionModel2Hidden() {
         const model = tf.sequential();
         model.add(tf.layers.dense({
-        inputShape: [trainData.numFeatures],
-        units: 50,
-        activation: 'sigmoid',
-        kernelInitializer: 'leCunNormal'
+            inputShape: [trainData.numFeatures],
+            units: 50,
+            activation: 'sigmoid',
+            kernelInitializer: 'leCunNormal'
         }));
         model.add(tf.layers.dense(
             {units: 50, activation: 'sigmoid', kernelInitializer: 'leCunNormal'}));
@@ -79,22 +88,20 @@ export default class Train extends React.Component {
     }
 
     async run(model, stateDataName) {
-        console.log(stateDataName)
-        model.compile(
-            {optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
+        model.compile({optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
+        const metrics = ['loss', 'val_loss', 'acc', 'val_acc'];
+        const container = {
+            name: stateDataName, styles: { width: '1200px' }
 
+        };
+        const fitCallbacks = tfvis.show.fitCallbacks(container, metrics);
         await model.fit(tensors.trainFeatures, tensors.trainTarget, {
-        batchSize: BATCH_SIZE,
-        epochs: NUM_EPOCHS,
-        validationSplit: 0.2,
-        callbacks: {
-            onEpochEnd: async (epoch, logs) => {
-            //console.log(epoch, logs, logs.loss)
-            this.setState({[stateDataName]: this.state[stateDataName].concat(logs)})
-            }
-        }
+            batchSize: BATCH_SIZE,
+            epochs: NUM_EPOCHS,
+            validationSplit: 0.2,
+            callbacks: fitCallbacks
         }).then(info => {
-            console.log('Final accuracy', info);
+            console.log('Final accuracy', info)
           })
     };
 
@@ -104,7 +111,7 @@ export default class Train extends React.Component {
 
 
     render () {
-        return <div>
+        return <div className='section'>
             <p className='section-head'>Training Progress</p>
             <div className="withCols">
                 <div id="linear">
@@ -115,9 +122,6 @@ export default class Train extends React.Component {
                     >
                         Train Linear Regressor
                     </button>
-                    <div className="chart">
-                        <Chart data={this.getDataForChart(this.state.linearTrainHistory)}/>
-                    </div>
                 </div>
                 <div id="oneHidden">
                     <div className="status"></div>
@@ -127,9 +131,6 @@ export default class Train extends React.Component {
                     >
                         Train Neural Network Regressor (1 hidden layer)
                     </button>
-                    <div className="chart">
-                        <Chart data={this.getDataForChart(this.state.oneHiddenTrainHistory)}/>
-                    </div>
                 </div>
                 <div id="twoHidden">
                     <div className="status"></div>
@@ -139,9 +140,6 @@ export default class Train extends React.Component {
                     >
                         Train Neural Network Regressor (2 hidden layers)
                     </button>
-                    <div className="chart">
-                        <Chart data={this.getDataForChart(this.state.twoHiddenTrainHistory)}/>
-                    </div>
                 </div>
             </div>
         </div>
