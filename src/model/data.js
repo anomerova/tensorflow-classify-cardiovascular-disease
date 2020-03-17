@@ -35,8 +35,8 @@ export class Dataset {
     ])
     const outputs = csv.map(d => d.cardio);
 
-    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.001);
-    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.001);
+    [this.trainFeatures, this.testFeatures] = trainTestSplit(inputs, 0.3);
+    [this.trainTarget, this.testTarget] = trainTestSplit(outputs, 0.3);
 
     shuffle(this.trainFeatures, this.trainTarget)
     shuffle(this.testFeatures, this.testTarget)

@@ -35,7 +35,7 @@ class AppLayout extends React.Component {
                       <span>Ввод параметров для диагностики</span>
                     </NavLink>
                   </Menu.Item>
-                  <Menu.Item key="1">
+                  <Menu.Item key="2">
                     <NavLink exact to="/train" activeClassName="selected">
                       <Icon type="upload" />
                       <span>Обучение моделей</span>

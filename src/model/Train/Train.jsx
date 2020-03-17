@@ -3,15 +3,15 @@ import * as tf from '@tensorflow/tfjs'
 import * as tfvis from '@tensorflow/tfjs-vis';
 import {Dataset, featureDescriptions} from '../data.js'
 import * as normalization from '../normalization'
-import { Table } from 'antd'
+import { Table, Pagination } from 'antd'
 
 import './Train.less'
 
 const trainData = new Dataset
 const tensors = {}
 
-const NUM_EPOCHS = 200;
-const BATCH_SIZE = 40;
+const NUM_EPOCHS = 500;
+const BATCH_SIZE = 100;
 const LEARNING_RATE = 0.01;
 
 export function arraysToTensors() {
@@ -36,8 +36,11 @@ export default class Train extends React.Component {
 
         this.state = {
             linearTrainHistory: [],
+            linearTrainLoss: {},
             oneHiddenTrainHistory: [],
-            twoHiddenTrainHistory: []
+            oneHiddenTrainLoss: {},
+            twoHiddenTrainHistory: [],
+            twoHiddenTrainLoss: {},
         }
 
         this.linearTrainRef = React.createRef()
@@ -94,7 +97,7 @@ export default class Train extends React.Component {
         return outList;
       }
 
-    async run(model, stateDataName, ref) {
+    async run(model, stateDataName, ref, stateLossName) {
         model.compile({optimizer: tf.train.sgd(LEARNING_RATE), loss: 'meanSquaredError'});
         const trainLogs = []
         await model.fit(tensors.trainFeatures, tensors.trainTarget, {
@@ -106,53 +109,108 @@ export default class Train extends React.Component {
                     trainLogs.push(logs);
                     tfvis.show.history(this[ref].current, trainLogs, ['loss', 'val_loss'])
 
-                    model.layers[0].getWeights()[0].data().then(kernelAsArr => {
-                        const weightsList = this.describeKernelElements(kernelAsArr)
-                        const weightArray = weightsList.sort((a, b) => Math.abs(b.value) - Math.abs(a.value))
-                        this.setState({[stateDataName]: weightArray})
-                      });
+                     if(stateDataName === 'linearTrainHistory'){
+                        model.layers[0].getWeights()[0].data().then(kernelAsArr => {
+                            const weightsList = this.describeKernelElements(kernelAsArr)
+                            const weightArray = weightsList.sort((a, b) => b.value - a.value)
+                            this.setState({[stateDataName]: weightArray})
+                        })
+                    }
                 }
             }
         })
+
+        const result = model.evaluate(
+            tensors.testFeatures, tensors.testTarget, {batchSize: BATCH_SIZE});
+        const testLoss = result.dataSync()[0];
+      
+        const trainLoss = trainLogs[trainLogs.length - 1].loss;
+        const valLoss = trainLogs[trainLogs.length - 1].val_loss;
+
+        this.setState({[stateLossName]: {
+            trainLoss: trainLoss.toFixed(4),
+            valLoss: valLoss.toFixed(4),
+            testLoss: testLoss.toFixed(4),
+        }})
     };
 
     getDataForChart(data) {
         return data.map(item => {return {x: item.val_loss, y: item.loss}})
     }
 
-
     render () {
+        const columns = [
+            {
+              title: 'Признак',
+              dataIndex: 'description',
+              key: 'description',
+            },
+            {
+              title: 'Вес',
+              dataIndex: 'value',
+              key: 'value',
+            }
+        ];
         return <div className='section'>
             <p className='section-head'>Training Progress</p>
             <div className="withCols">
                 <div id="linear">
-                    <div className="status"></div>
+                    {Object.entries(this.state.linearTrainLoss).length !== 0 ? 
+                        <div>
+                            Final train-set loss: {this.state.linearTrainLoss.trainLoss} <br />
+                            Final validation-set loss: {this.state.linearTrainLoss.valLoss} <br />
+                            Test-set loss: {this.state.linearTrainLoss.testLoss} <br />
+                        </div> :
+                        null
+                    }
                     <button 
                         id="simple-mlr"
                         onClick={async (e) => {
                             await this.run(
                                 this.linearRegressionModel(),
                                 'linearTrainHistory',
-                                'linearTrainRef'
+                                'linearTrainRef',
+                                'linearTrainLoss'
                             )
                         }}
                     >
                         Train Linear Regressor
                     </button>
                     <div ref={this.linearTrainRef} />
-                    <div>
-                    <Table dataSource={this.state.linearTrainHistory} />;
-                    </div>
+                    {this.state.linearTrainHistory.length !== 0 ?
+                        <div>
+                            <Table 
+                                dataSource={this.state.linearTrainHistory} 
+                                columns={columns} 
+                                size="small"
+                                bordered={true}
+                                rowKey={record => record.description}
+                                pagination={{
+                                    defaultCurrent: 1,
+                                    defaultPageSize: 5
+                                }}
+                            />
+                        </div> :
+                        null
+                    }
                 </div>
                 <div id="oneHidden">
-                    <div className="status"></div>
+                    {Object.entries(this.state.oneHiddenTrainLoss).length !== 0 ? 
+                        <div>
+                            Final train-set loss: {this.state.oneHiddenTrainLoss.trainLoss} <br />
+                            Final validation-set loss: {this.state.oneHiddenTrainLoss.valLoss} <br />
+                            Test-set loss: {this.state.oneHiddenTrainLoss.testLoss} <br />
+                        </div> :
+                        null
+                    }
                     <button 
                         id="nn-mlr-1hidden"
                         onClick={async () => {
                             await this.run(
                                 this.multiLayerPerceptronRegressionModel1Hidden(),
                                 'oneHiddenTrainHistory',
-                                'oneHiddenTrainRef'
+                                'oneHiddenTrainRef',
+                                'oneHiddenTrainLoss'
                             )
                         }}
                     >
@@ -161,14 +219,22 @@ export default class Train extends React.Component {
                     <div ref={this.oneHiddenTrainRef} />
                 </div>
                 <div id="twoHidden">
-                    <div className="status"></div>
+                    {Object.entries(this.state.twoHiddenTrainLoss).length !== 0 ? 
+                        <div>
+                            Final train-set loss: {this.state.twoHiddenTrainLoss.trainLoss} <br />
+                            Final validation-set loss: {this.state.twoHiddenTrainLoss.valLoss} <br />
+                            Test-set loss: {this.state.twoHiddenTrainLoss.testLoss} <br />
+                        </div> :
+                        null
+                    }
                     <button 
                         id="nn-mlr-2hidden"
                         onClick={async () => {
                             await this.run(
                                 this.multiLayerPerceptronRegressionModel2Hidden(),
                                 'twoHiddenTrainHistory',
-                                'twoHiddenTrainRef'
+                                'twoHiddenTrainRef',
+                                'twoHiddenTrainLoss'
                             )
                         }}
                     >
