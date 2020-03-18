@@ -10,7 +10,7 @@ import './Train.less'
 const trainData = new Dataset
 const tensors = {}
 
-const NUM_EPOCHS = 500;
+const NUM_EPOCHS = 400;
 const BATCH_SIZE = 100;
 const LEARNING_RATE = 0.01;
 
@@ -160,6 +160,7 @@ export default class Train extends React.Component {
                             Final train-set loss: {this.state.linearTrainLoss.trainLoss} <br />
                             Final validation-set loss: {this.state.linearTrainLoss.valLoss} <br />
                             Test-set loss: {this.state.linearTrainLoss.testLoss} <br />
+                            Dataset size: {trainData.trainFeatures.length}
                         </div> :
                         null
                     }
@@ -200,6 +201,7 @@ export default class Train extends React.Component {
                             Final train-set loss: {this.state.oneHiddenTrainLoss.trainLoss} <br />
                             Final validation-set loss: {this.state.oneHiddenTrainLoss.valLoss} <br />
                             Test-set loss: {this.state.oneHiddenTrainLoss.testLoss} <br />
+                            Dataset size: {trainData.trainFeatures.length}
                         </div> :
                         null
                     }
@@ -224,6 +226,7 @@ export default class Train extends React.Component {
                             Final train-set loss: {this.state.twoHiddenTrainLoss.trainLoss} <br />
                             Final validation-set loss: {this.state.twoHiddenTrainLoss.valLoss} <br />
                             Test-set loss: {this.state.twoHiddenTrainLoss.testLoss} <br />
+                            Dataset size: {trainData.trainFeatures.length}
                         </div> :
                         null
                     }
